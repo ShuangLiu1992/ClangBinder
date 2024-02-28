@@ -1,0 +1,3 @@
+[submodule "conan_deps"]
+	path = conan_deps
+	url = git@github.com:ShuangLiu1992/conan_deps.git
