@@ -11,4 +11,4 @@ class ClangBinderonan(ConanFile):
     generators = "CMakeDeps"
 
     def requirements(self):
-        self.requires("llvm/18.1.0-rc3@")
+        self.requires("llvm/18.1.0-rc4@")
