@@ -8,7 +8,7 @@ class ClangBinderonan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     options = {"shared": [True, False], "fPIC": [True, False]}
     default_options = {"shared": False, "fPIC": True}
-    generators = "CMakeDeps"
+    generators = "CMakeDeps", "CMakeToolchain"
 
     def requirements(self):
         self.requires("llvm/18.1.0-rc4@")
