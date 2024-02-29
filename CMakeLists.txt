@@ -3,10 +3,13 @@ cmake_minimum_required(VERSION 3.28)
 project(ClangBinder CXX)
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 
-find_package(Clang REQUIRED)
-
+find_package(Clang REQUIRED CONFIG)
 add_executable(${PROJECT_NAME})
+target_sources(${PROJECT_NAME} PRIVATE main.cc)
+target_include_directories(${PROJECT_NAME} PUBLIC ${CLANG_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} PUBLIC
+        clangBasic
+        clangAST
 )
 if (CLANGBINDER_INSTALL)
     install(TARGETS ${PROJECT_NAME}
