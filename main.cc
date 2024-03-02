@@ -4,6 +4,7 @@
 #include <clang/Basic/SourceLocation.h>
 #include <clang/Frontend/CompilerInstance.h>
 #include <clang/Tooling/CommonOptionsParser.h>
+#include <clang/Tooling/Tooling.h>
 
 int main(int argc, const char** argv)
 {
@@ -15,5 +16,6 @@ int main(int argc, const char** argv)
     llvm::cl::OptionCategory category{"ClangBinder"};
     llvm::Expected<clang::tooling::CommonOptionsParser> eop = clang::tooling::CommonOptionsParser::create(
         argc, argv, category);
+    clang::tooling::ClangTool tool(eop->getCompilations(), eop->getSourcePathList());
     return 1;
 }
