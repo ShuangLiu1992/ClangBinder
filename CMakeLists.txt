@@ -10,6 +10,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${CLANG_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} PUBLIC
         clangBasic
         clangAST
+        clangTooling
 )
 if (CLANGBINDER_INSTALL)
     install(TARGETS ${PROJECT_NAME}
