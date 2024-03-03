@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.28)
 
 project(ClangBinder CXX)
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
+set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
 find_package(Clang REQUIRED CONFIG)
 add_executable(${PROJECT_NAME})
