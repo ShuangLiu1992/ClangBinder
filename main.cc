@@ -5,6 +5,8 @@
 #include <clang/Frontend/CompilerInstance.h>
 #include <clang/Tooling/CommonOptionsParser.h>
 #include <clang/Tooling/Tooling.h>
+#include <stdarg.h>
+#include <stddef.h>
 
 llvm::cl::OptionCategory category{"ClangBinder"};
 
