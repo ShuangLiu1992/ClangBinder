@@ -46,6 +46,10 @@ int main(int argc, const char** argv)
         argc, argv, category))
     {
         clang::tooling::ClangTool tool(eop->getCompilations(), eop->getSourcePathList());
+        for (auto s : eop->getSourcePathList())
+        {
+            llvm::outs() << s << "\n";
+        }
         tool.run(clang::tooling::newFrontendActionFactory<BinderFrontendAction>().get());
     }
     return 1;
