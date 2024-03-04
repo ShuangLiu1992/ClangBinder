@@ -8,61 +8,43 @@
 
 llvm::cl::OptionCategory category{"ClangBinder"};
 
-struct BinderVisitor : clang::RecursiveASTVisitor<BinderVisitor>
-{
-    explicit BinderVisitor(clang::CompilerInstance* ci) : ast_context_(ci->getASTContext())
-    {
-    }
+struct BinderVisitor final : clang::RecursiveASTVisitor<BinderVisitor> {
+    explicit BinderVisitor(const clang::CompilerInstance *ci) : ast_context_(ci->getASTContext()) {}
 
-    bool shouldVisitTemplateInstantiations() const { return true; }
+    static bool shouldVisitTemplateInstantiations() { return true; }
 
-    virtual bool VisitFunctionDecl(clang::FunctionDecl* F)
-    {
+    static bool VisitFunctionDecl(const clang::FunctionDecl *F) {
         llvm::outs() << F->getName() << "\n";
+        llvm::outs() << F->getQualifiedNameAsString() << "\n";
         return true;
     }
 
-    clang::ASTContext& ast_context_;
+    clang::ASTContext &ast_context_;
 };
 
-struct BinderASTConsumer : clang::ASTConsumer
-{
+struct BinderASTConsumer final : clang::ASTConsumer {
     BinderVisitor visitor_;
     // override the constructor in order to pass CI
-    explicit BinderASTConsumer(clang::CompilerInstance* ci) : visitor_(ci)
-    {
-    }
+    explicit BinderASTConsumer(clang::CompilerInstance *ci) : visitor_(ci) {}
 
     // override this to call our ExampleVisitor on the entire source file
-    void HandleTranslationUnit(clang::ASTContext& context) override
-    {
-        visitor_.TraverseDecl(context.getTranslationUnitDecl());
-    }
+    void HandleTranslationUnit(clang::ASTContext &context) override { visitor_.TraverseDecl(context.getTranslationUnitDecl()); }
 };
 
-struct BinderFrontendAction : clang::ASTFrontendAction
-{
-    virtual std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance& ci, llvm::StringRef file)
-    {
+struct BinderFrontendAction final : clang::ASTFrontendAction {
+    std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance &ci, const llvm::StringRef file) override {
         llvm::outs() << "Process input file " << file << "\n";
         return std::unique_ptr<clang::ASTConsumer>(new BinderASTConsumer(&ci));
     }
 };
 
-
-int main(int argc, const char** argv)
-{
-    llvm::cl::SetVersionPrinter([](llvm::raw_ostream& OS)
-    {
-        OS << "LLVM " << LLVM_VERSION_MAJOR << "." << LLVM_VERSION_MINOR <<
-            "." << LLVM_VERSION_PATCH << "\n";
+int main(int argc, const char **argv) {
+    llvm::cl::SetVersionPrinter([](llvm::raw_ostream &OS) {
+        OS << "LLVM " << LLVM_VERSION_MAJOR << "." << LLVM_VERSION_MINOR << "." << LLVM_VERSION_PATCH << "\n";
     });
-    if (auto eop = clang::tooling::CommonOptionsParser::create(
-        argc, argv, category))
-    {
+    if (auto eop = clang::tooling::CommonOptionsParser::create(argc, argv, category)) {
         clang::tooling::ClangTool tool(eop->getCompilations(), eop->getSourcePathList());
-        for (auto s : eop->getSourcePathList())
-        {
+        for (auto s : eop->getSourcePathList()) {
             llvm::outs() << s << "\n";
         }
         tool.run(clang::tooling::newFrontendActionFactory<BinderFrontendAction>().get());
