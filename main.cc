@@ -5,30 +5,43 @@
 #include <clang/Frontend/CompilerInstance.h>
 #include <clang/Tooling/CommonOptionsParser.h>
 #include <clang/Tooling/Tooling.h>
-#include <stdarg.h>
-#include <stddef.h>
 
 llvm::cl::OptionCategory category{"ClangBinder"};
 
-
-class BinderASTConsumer : public clang::ASTConsumer
+struct BinderVisitor : clang::RecursiveASTVisitor<BinderVisitor>
 {
-public:
+    explicit BinderVisitor(clang::CompilerInstance* ci) : ast_context_(ci->getASTContext())
+    {
+    }
+
+    bool shouldVisitTemplateInstantiations() const { return true; }
+
+    virtual bool VisitFunctionDecl(clang::FunctionDecl* F)
+    {
+        llvm::outs() << F->getName() << "\n";
+        return true;
+    }
+
+    clang::ASTContext& ast_context_;
+};
+
+struct BinderASTConsumer : clang::ASTConsumer
+{
+    BinderVisitor visitor_;
     // override the constructor in order to pass CI
-    explicit BinderASTConsumer(clang::CompilerInstance* ci)
+    explicit BinderASTConsumer(clang::CompilerInstance* ci) : visitor_(ci)
     {
     }
 
     // override this to call our ExampleVisitor on the entire source file
-    virtual void HandleTranslationUnit(clang::ASTContext& context)
+    void HandleTranslationUnit(clang::ASTContext& context) override
     {
-        context.getTranslationUnitDecl();
+        visitor_.TraverseDecl(context.getTranslationUnitDecl());
     }
 };
 
-class BinderFrontendAction : public clang::ASTFrontendAction
+struct BinderFrontendAction : clang::ASTFrontendAction
 {
-public:
     virtual std::unique_ptr<clang::ASTConsumer> CreateASTConsumer(clang::CompilerInstance& ci, llvm::StringRef file)
     {
         llvm::outs() << "Process input file " << file << "\n";
