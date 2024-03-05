@@ -5,6 +5,9 @@ set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
 find_package(Clang REQUIRED CONFIG)
+find_package(fmt REQUIRED)
+find_package(Boost REQUIRED)
+find_package(range-v3 REQUIRED)
 add_executable(${PROJECT_NAME})
 target_sources(${PROJECT_NAME} PRIVATE main.cc)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CLANG_INCLUDE_DIRS})
@@ -12,7 +15,21 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
         clangBasic
         clangAST
         clangTooling
+
+        fmt::fmt
+        range-v3::range-v3
+        Boost::headers
 )
+
+include(ExternalProject)
+ExternalProject_Add(TestExport
+        SOURCE_DIR ${CMAKE_SOURCE_DIR}/test_export
+        BINARY_DIR ${CMAKE_BINARY_DIR}/test_export
+        BUILD_COMMAND "" # Disable build step.
+        INSTALL_COMMAND "" # Disable install step.
+)
+add_dependencies(${PROJECT_NAME} TestExport)
+
 if (CLANGBINDER_INSTALL)
     install(TARGETS ${PROJECT_NAME}
             EXPORT ${PROJECT_NAME}Targets

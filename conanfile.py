@@ -13,3 +13,5 @@ class ClangBinderonan(ConanFile):
     def requirements(self):
         self.requires("llvm/18.1.0-rc4")
         self.requires("boost/1.84.0")
+        self.requires("fmt/10.2.1")
+        self.requires("range_v3/0.12.1")
